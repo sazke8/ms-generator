@@ -55,7 +55,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void generateController(String name) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/sazke/Desktop/" + name + "Controller.kt", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/ultron/Desktop/" + name + "Controller.kt", true));
         generateImportsController(writer,name);
         generateAnnotations(writer, name);
         generateFindAll(writer, name);
@@ -87,7 +87,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void generateRepository(String name) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/sazke/Desktop/" + name + "Repository.kt", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/ultron/Desktop/" + name + "Repository.kt", true));
         generateImportsRepository(writer, name);
         writer.close();
     }
@@ -95,7 +95,8 @@ public class MainView extends VerticalLayout {
 
     private BufferedWriter generateImportsRepository(BufferedWriter writer, String name) throws IOException {
 
-        writer.append("interface " + name + "Repository: JpaRepository<" + name + "Models,Long>");
+        writer.append("import org.springframework.data.jpa.repository.JpaRepository\n\n");
+        writer.append("interface " + name + "Repository: JpaRepository<" + name + "Model,Long>");
         return writer;
     }
 
@@ -111,7 +112,7 @@ public class MainView extends VerticalLayout {
 
     private BufferedWriter generateFindAll(BufferedWriter writer, String name) throws IOException {
         writer.append("@GetMapping\n");
-        writer.append("fun findAll(): MutableList<" + name + "Models> = " + name.toLowerCase() + "Repository.findAll()\n\n");
+        writer.append("fun findAll(): MutableList<" + name + "Model> = " + name.toLowerCase() + "Repository.findAll()\n\n");
         return writer;
     }
 
@@ -125,34 +126,34 @@ public class MainView extends VerticalLayout {
         writer.append("   } catch (e: DataAccessException) {\n");
         writer.append(" response[\"message\"] = \"Something go wrong consulting database\"\n");
         writer.append("response[\"error\"] = \"${e.message} : ${e.mostSpecificCause.message}\"\n");
-        writer.append("println(\"Error ${e.mostSpecificCause.message()}\")\n");
+        writer.append("println(\"Error ${e.mostSpecificCause.message}\")\n");
         writer.append(" return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)\n  }\n");
         writer.append("     if (!e.isPresent) {\n");
-        writer.append("response[\"message\"] = \"The id: ${id} not exist!\n");
+        writer.append("response[\"message\"] = \"The id: ${id} not exist!\"\n");
         writer.append("return ResponseEntity(response, HttpStatus.NOT_FOUND)\n}\n");
-        writer.append("return ResponseEntity(e.get(), HttpStatus.OK)\n\n");
+        writer.append("return ResponseEntity(e.get(), HttpStatus.OK)\n}\n\n");
         return writer;
     }
 
     private BufferedWriter generateCreate(BufferedWriter writer, String name) throws IOException {
         writer.append("@PostMapping\n");
-        writer.append("fun create(@Valid @RequestBody " + name.toLowerCase() + "Models: " + name + "Model): ResponseEntity<Any>{\n");
+        writer.append("fun create(@Valid @RequestBody " + name.toLowerCase() + "Model: " + name + "Model): ResponseEntity<Any>{\n");
         writer.append("val response = HashMap<String, Any>()\n");
         writer.append("val e:" + name + "Model\n");
-        writer.append("try {\n e = " + name + "Repository.save(" + name.toLowerCase() + "Models)\n}");
+        writer.append("try {\n e = " + name.toLowerCase() + "Repository.save(" + name.toLowerCase() + "Model)\n}");
         writer.append("catch (e: DataAccessException) {\n");
-        writer.append("println(\"Error ${e.mostSpecificCause.message()}\")\n");
+        writer.append("println(\"Error ${e.mostSpecificCause.message}\")\n");
         writer.append("response[\"message\"] = \"Something go wrong inserting at database in" + name + "\"\n");
         writer.append("response[\"error\"] = \"${e.message} : ${e.mostSpecificCause.message}\"\n");
         writer.append(" return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)\n}\n");
-        writer.append("response[\"message\"] = \"The " + name + " has been inseted\"\n response[\"entity\"] = e");
-        writer.append("return  ResponseEntity(response, HttpStatus.CREATED)\n\n");
+        writer.append("response[\"message\"] = \"The " + name + " has been inseted\"\n response[\"entity\"] = e\n");
+        writer.append("return  ResponseEntity(response, HttpStatus.CREATED)\n}\n\n");
         return writer;
     }
 
     private BufferedWriter generatePut(BufferedWriter writer, String name) throws IOException {
         writer.append("@PutMapping(\"{id}\")\n");
-        writer.append("fun update(@PathVariable(\"id\") id: Long, @Valid @RequestBody " + name.toLowerCase() + "Model: " + name + "Models): " + name + "Models {\n\n");
+        writer.append("fun update(@PathVariable(\"id\") id: Long, @Valid @RequestBody " + name.toLowerCase() + "Model: " + name + "Model): " + name + "Model {\n\n");
         return writer;
     }
 
