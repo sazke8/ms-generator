@@ -17,7 +17,7 @@
 
         <drivers.dir>${project.basedir}/drivers</drivers.dir>
         <drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
-        <kotlin.version>1.0.0</kotlin.version>
+        <kotlin.version>1.6.0</kotlin.version>
     </properties>
 
     <parent>
